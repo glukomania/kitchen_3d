@@ -16,7 +16,9 @@ export function CabinetItem(props: Props) {
 
   const getImagePath = () => {
     const typeStr = props.type === "top" ? "upper" : "bottom";
-    return `/${props.size}_${typeStr}.png`;
+    // Use BASE_URL to handle base path correctly
+    const base = import.meta.env.BASE_URL;
+    return `${base}${props.size}_${typeStr}.png`;
   };
 
   return (
