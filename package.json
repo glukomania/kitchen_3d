@@ -6,14 +6,12 @@
   "homepage": "https://glukomania.github.io/kitchen_3d/",
   "scripts": {
     "dev": "vite",
-    "build": "vite build -c vite.widget.config.ts",
-    "build:demo": "vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "format": "prettier . --check",
     "format:fix": "prettier . --write",
-    "predeploy": "npm run build:demo",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
