@@ -16,9 +16,8 @@ export function CabinetItem(props: Props) {
 
   const getImagePath = () => {
     const typeStr = props.type === "top" ? "upper" : "bottom";
-    // Use BASE_URL to handle base path correctly
-    const base = import.meta.env.BASE_URL;
-    return `${base}${props.size}_${typeStr}.png`;
+    // Files from public/ are copied to dist/ root, so we need to use base path
+    return `/kitchen_3d/${props.size}_${typeStr}.png`;
   };
 
   return (
