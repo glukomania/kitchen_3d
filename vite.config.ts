@@ -3,6 +3,7 @@ import path from "node:path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  base: "/kitchen_3d/",
   plugins: [react()],
   resolve: {
     alias: {
