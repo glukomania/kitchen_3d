@@ -13,6 +13,8 @@ export default defineConfig({
     }
   },
   build: {
+    outDir: "dist",
+    emptyOutDir: false,
     lib: {
       entry: "src/widget/entry.ts",
       name: "SkoumalConfigurator",

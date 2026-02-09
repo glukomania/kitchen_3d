@@ -8,12 +8,14 @@
     "dev": "vite",
     "build": "vite build",
     "build:widget": "vite build --config vite.widget.config.ts",
+    "build:all": "npm run build && npm run build:widget",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "format": "prettier . --check",
     "format:fix": "prettier . --write",
-    "deploy": "gh-pages -d dist"
+    "predeploy": "npm run build:all",
+    "deploy": "npm run predeploy && gh-pages -d dist"
   },
   "dependencies": {
     "react": "^18.3.1",

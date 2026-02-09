@@ -32,6 +32,14 @@ Build demo app:
 npm run build
 ```
 
+Build everything (app + widget) for deployment:
+
+```bash
+npm run build:all
+```
+
+**Note:** When deploying to GitHub Pages (via `npm run deploy` or GitHub Actions), both the demo app and widget are automatically built and included in the `dist` folder.
+
 Lint/format:
 
 ```bash
