@@ -21,13 +21,15 @@ npm run dev
 Build the **widget** (IIFE, drop-in):
 
 ```bash
-npm run build
+npm run build:widget
 ```
 
-Build demo:
+This produces `dist/configurator-widget.iife.js` and `dist/configurator-widget.css`.
+
+Build demo app:
 
 ```bash
-npm run build:demo
+npm run build
 ```
 
 Lint/format:
@@ -40,43 +42,70 @@ npm run format:fix
 
 ## Embed as a web component
 
-`npm run build` produces `dist/configurator-widget.iife.js`.
+`npm run build:widget` produces `dist/configurator-widget.iife.js` and `dist/configurator-widget.css`.
 The bundle auto-registers the custom element **`<sk-configurator>`**.
 
-Minimal embed:
+### Embedding on another page
+
+If the widget is hosted on GitHub Pages (e.g., `https://glukomania.github.io/kitchen_3d/`):
 
 ```html
-<script src="dist/configurator-widget.iife.js"></script>
-<sk-configurator data-renderer="three"></sk-configurator>
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Load widget CSS -->
+  <link rel="stylesheet" href="https://glukomania.github.io/kitchen_3d/configurator-widget.css">
+</head>
+<body>
+  <!-- Load widget script -->
+  <script src="https://glukomania.github.io/kitchen_3d/configurator-widget.iife.js"></script>
+  
+  <!-- Use custom element -->
+  <sk-configurator id="my-configurator"></sk-configurator>
+  
+  <script>
+    // Pass catalog via data-catalog attribute
+    const catalog = {
+      products: [
+        {
+          id: "kitchen",
+          title: "Kuchyň",
+          subtitle: "Konfigurátor kuchyně",
+          basePrice: { amount: 50000, currency: "CZK" },
+          optionGroups: [
+            {
+              id: "color",
+              kind: "swatches",
+              label: "Barva",
+              options: [
+                { id: "white", label: "Bílá", color: "#FFFFFF" },
+                { id: "light-gray", label: "Světle šedá", color: "#F3F4F6" }
+              ],
+              defaultOptionId: "white"
+            }
+          ]
+        }
+      ]
+    };
+    
+    // Wait for element registration and set catalog
+    customElements.whenDefined('sk-configurator').then(() => {
+      const element = document.getElementById('my-configurator');
+      element.setAttribute('data-catalog', JSON.stringify(catalog));
+    });
+  </script>
+</body>
+</html>
 ```
 
-Pass catalog data (JSON via attribute):
+### Local development embed
+
+For local testing:
 
 ```html
-<script>
-  const catalog = {
-    products: [
-      {
-        id: "chairs",
-        title: "Chairs",
-        subtitle: "Office chairs",
-        basePrice: { amount: 9339, currency: "CZK" },
-        optionGroups: [
-          {
-            id: "color",
-            kind: "swatches",
-            label: "Color",
-            options: [{ id: "black", label: "Black", color: "#111827" }],
-            defaultOptionId: "black"
-          }
-        ]
-      }
-    ]
-  };
-
-  const element = document.querySelector("sk-configurator");
-  element.setAttribute("data-catalog", JSON.stringify(catalog));
-<\/script>
+<link rel="stylesheet" href="dist/configurator-widget.css">
+<script src="dist/configurator-widget.iife.js"></script>
+<sk-configurator id="my-configurator"></sk-configurator>
 ```
 
 Note: this starter renders into **light DOM** (no shadow DOM) so Tailwind styles work without style injection complexity.

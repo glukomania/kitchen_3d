@@ -20,7 +20,18 @@ export default defineConfig({
       fileName: () => "configurator-widget.iife.js"
     },
     sourcemap: true,
-    cssCodeSplit: false
+    cssCodeSplit: false,
+    rollupOptions: {
+      output: {
+        assetFileNames: (assetInfo) => {
+          // CSS file will have a fixed name for easier inclusion
+          if (assetInfo.name === 'style.css') {
+            return 'configurator-widget.css';
+          }
+          return assetInfo.name || 'asset';
+        }
+      }
+    }
   }
 });
 

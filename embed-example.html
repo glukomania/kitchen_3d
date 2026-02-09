@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurator embed example</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kitchen Configurator</h1>
+  
+  <!-- Load widget CSS (if a separate file is created) -->
+  <link rel="stylesheet" href="https://glukomania.github.io/kitchen_3d/configurator-widget.css">
+  
+  <!-- Load widget from GitHub Pages -->
+  <script src="https://glukomania.github.io/kitchen_3d/configurator-widget.iife.js"></script>
+  
+  <!-- Use custom element -->
+  <sk-configurator id="my-configurator"></sk-configurator>
+  
+  <script>
+    // Example catalog (can be loaded from server or passed from parent page)
+    const catalog = {
+      products: [
+        {
+          id: "kitchen",
+          title: "Kuchyň",
+          subtitle: "Konfigurátor kuchyně",
+          basePrice: { amount: 50000, currency: "CZK" },
+          optionGroups: [
+            {
+              id: "color",
+              kind: "swatches",
+              label: "Barva",
+              options: [
+                { id: "white", label: "Bílá", color: "#FFFFFF" },
+                { id: "light-gray", label: "Světle šedá", color: "#F3F4F6" },
+                { id: "beige", label: "Béžová", color: "#F5F5DC" }
+              ],
+              defaultOptionId: "white"
+            },
+            {
+              id: "top-cabinets",
+              kind: "select",
+              label: "Horní skříňky",
+              options: [
+                { id: "top-40", label: "40 cm" },
+                { id: "top-60", label: "60 cm" }
+              ],
+              defaultOptionId: "top-40"
+            },
+            {
+              id: "bottom-cabinets",
+              kind: "select",
+              label: "Dolní skříňky",
+              options: [
+                { id: "bottom-40", label: "40 cm" },
+                { id: "bottom-60", label: "60 cm" }
+              ],
+              defaultOptionId: "bottom-40"
+            }
+          ]
+        }
+      ]
+    };
+    
+    // Wait for script loading and element registration
+    if (customElements.get('sk-configurator')) {
+      // Element is already registered
+      const element = document.getElementById('my-configurator');
+      element.setAttribute('data-catalog', JSON.stringify(catalog));
+    } else {
+      // Wait for element registration
+      customElements.whenDefined('sk-configurator').then(() => {
+        const element = document.getElementById('my-configurator');
+        element.setAttribute('data-catalog', JSON.stringify(catalog));
+      });
+    }
+  </script>
+</body>
+</html>
