@@ -89,9 +89,9 @@ In your Shopify theme editor, add a custom HTML block with the following code:
 - They don't affect widget functionality
 
 #### Styling conflicts
-- The widget renders into light DOM, so Shopify styles might affect it
-- If needed, add custom CSS to override Shopify styles
-- Use more specific selectors or `!important` if necessary
+- **Fixed**: Widget styles are now isolated with `sk-configurator` scoping
+- Tailwind preflight is disabled to prevent conflicts with host page
+- Widget has its own reset styles that don't affect the host page
 
 ### 3. Testing
 
