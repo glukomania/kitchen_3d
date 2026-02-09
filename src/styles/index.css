@@ -1,10 +1,50 @@
-@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Minimal baseline for demo + widget host pages */
-:root {
-  color-scheme: light;
+/* Widget isolation and reset */
+sk-configurator {
+  /* Isolate from host page styles */
+  all: initial;
+  display: block;
+  
+  /* Set base styles for widget */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure all children inherit box-sizing */
+sk-configurator *,
+sk-configurator *::before,
+sk-configurator *::after {
+  box-sizing: border-box;
+}
+
+/* Reset common elements inside widget */
+sk-configurator div,
+sk-configurator button,
+sk-configurator img,
+sk-configurator input,
+sk-configurator select {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+sk-configurator button {
+  background: none;
+  cursor: pointer;
+}
+
+sk-configurator img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 
