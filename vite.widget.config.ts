@@ -6,6 +6,7 @@ import { defineConfig } from "vite";
 // - outputs an IIFE bundle that defines a Custom Element via `defineConfiguratorElement()`
 // - keeps it simple for "drop-in" usage
 export default defineConfig({
+  base: "/kitchen_3d/",
   plugins: [react()],
   resolve: {
     alias: {

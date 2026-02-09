@@ -116,6 +116,19 @@ For local testing:
 <sk-configurator id="my-configurator"></sk-configurator>
 ```
 
+### Embedding in Shopify or other platforms
+
+When embedding on external platforms (like Shopify), make sure:
+
+1. Load both CSS and JS files from GitHub Pages
+2. Use `customElements.whenDefined()` to wait for element registration before setting attributes
+3. Images are loaded from absolute URLs (configured automatically)
+
+**Important notes:**
+- The widget uses absolute URLs for assets (images) to work correctly on external sites
+- CSS must be loaded before the script to avoid styling issues
+- The widget renders into **light DOM** (no shadow DOM) so platform styles might affect it
+
 Note: this starter renders into **light DOM** (no shadow DOM) so Tailwind styles work without style injection complexity.
 
 ## Architecture rules (high level)

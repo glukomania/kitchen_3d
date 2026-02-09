@@ -14,7 +14,10 @@ export function WidgetRoot(props: Props) {
 
   useEffect(() => {
     if (!catalog) return;
-    dispatch.setCatalog(catalog);
+    // Use queueMicrotask to avoid setState during render error
+    queueMicrotask(() => {
+      dispatch.setCatalog(catalog);
+    });
   }, [catalog, dispatch]);
 
   return <Configurator />;

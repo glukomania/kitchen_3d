@@ -16,8 +16,10 @@ export function CabinetItem(props: Props) {
 
   const getImagePath = () => {
     const typeStr = props.type === "top" ? "upper" : "bottom";
-    // Files from public/ are copied to dist/ root, so we need to use base path
-    return `/kitchen_3d/${props.size}_${typeStr}.png`;
+    // Files from public/ are copied to dist/ root
+    // For widget embedded on external sites, use full GitHub Pages URL
+    const base = import.meta.env.BASE_URL || '/kitchen_3d/';
+    return `https://glukomania.github.io${base}${props.size}_${typeStr}.png`;
   };
 
   return (
