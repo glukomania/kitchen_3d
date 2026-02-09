@@ -9,7 +9,7 @@ export function Configurator() {
 
       <QuantityBar />
 
-      <div className="configurator-actions mt-4 grid gap-4 md:grid-cols-2">
+      <div className="configurator-actions mt-4 !grid gap-4 md:!grid-cols-2">
         <ButtonsPanel />
       </div>
     </div>

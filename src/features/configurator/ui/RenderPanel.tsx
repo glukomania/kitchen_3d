@@ -12,11 +12,11 @@ export function RenderPanel() {
   };
 
   return (
-    <div className="configurator-render-panel flex min-h-[450px] flex-col">
-      <div className="configurator-render-viewport flex-1">
+    <div className="configurator-render-panel !flex !min-h-[450px] !flex-col">
+      <div className="configurator-render-viewport !flex-1">
         {renderMode === "2d" ? <TwoDRenderer /> : <SceneRenderer />}
       </div>
-      <div className="configurator-render-actions mt-4 flex items-center justify-between">
+      <div className="configurator-render-actions mt-4 !flex !items-center !justify-between">
         <button
           type="button"
           onClick={toggleRenderMode}

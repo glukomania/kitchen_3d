@@ -19,7 +19,7 @@ export function OptionsPanel() {
   const subtitle = useMemo(() => product?.subtitle ?? "", [product]);
 
   return (
-    <div className="configurator-options-panel grid gap-6 md:grid-cols-[420px_1fr]">
+    <div className="configurator-options-panel !grid gap-6 md:!grid-cols-[420px_1fr]">
       <div className="configurator-options-section">
         <div className="configurator-header mb-6">
           <div className="configurator-title text-4xl font-semibold text-slate-900">{title}</div>
@@ -48,7 +48,7 @@ export function OptionsPanel() {
 
           <div className="configurator-cabinets-section">
             <FieldLabel>Skříňky</FieldLabel>
-            <div className="configurator-cabinets-grid mt-2 grid grid-cols-2 gap-3">
+            <div className="configurator-cabinets-grid mt-2 !grid !grid-cols-2 gap-3">
               <CabinetItem type="top" size="40" label="Horní 40cm" />
               <CabinetItem type="top" size="60" label="Horní 60cm" />
               <CabinetItem type="bottom" size="40" label="Dolní 40cm" />
