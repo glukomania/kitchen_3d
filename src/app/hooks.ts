@@ -16,6 +16,8 @@ export const useAppDispatch = () => {
     addCabinet: state.addCabinet,
     moveCabinet: state.moveCabinet,
     rotateCabinet: state.rotateCabinet,
-    removeCabinet: state.removeCabinet
+    removeCabinet: state.removeCabinet,
+    initShopify: state.initShopify,
+    addToCart: state.addToCart
   }));
 };
