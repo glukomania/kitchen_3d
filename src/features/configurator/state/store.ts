@@ -110,11 +110,14 @@ export const useConfiguratorStore = create<ConfiguratorStore>((set, get) => ({
     })),
 
   initShopify: async (config: ShopifyConfig) => {
+    console.log('🔧 [Store] Initializing Shopify with config:', { domain: config.domain });
     const client = new ShopifyClient(config);
     const adapter = new ShopifyAdapter(client);
     const cart = new ShopifyCart(client);
 
+    console.log('🔧 [Store] Fetching catalog from Shopify...');
     const catalog = await adapter.fetchCatalog();
+    console.log('🔧 [Store] Catalog fetched:', catalog.products.length, 'products');
 
     set({
       shopifyClient: client,
@@ -123,11 +126,25 @@ export const useConfiguratorStore = create<ConfiguratorStore>((set, get) => ({
       activeProductId: catalog.products[0]?.id ?? 'default',
       selectedOptions: getDefaultSelectedOptions(catalog, catalog.products[0]?.id ?? 'default')
     });
+    console.log('✅ [Store] Shopify initialized successfully');
   },
 
   addToCart: async () => {
+    console.log('🛒 [Store] addToCart called');
     const { shopifyCart, placedCabinets, catalog } = get();
-    if (!shopifyCart) throw new Error('Shopify not initialized');
+    
+    console.log('🛒 [Store] Placed cabinets:', placedCabinets);
+    console.log('🛒 [Store] Catalog products:', catalog.products.length);
+    
+    if (!shopifyCart) {
+      console.error('❌ [Store] Shopify not initialized!');
+      throw new Error('Shopify not initialized');
+    }
+
+    if (placedCabinets.length === 0) {
+      console.warn('⚠️ [Store] No cabinets placed!');
+      throw new Error('Please add at least one cabinet to the configurator');
+    }
 
     const items = placedCabinets.map(cabinet => {
       const product = catalog.products.find(p => 
@@ -136,8 +153,14 @@ export const useConfiguratorStore = create<ConfiguratorStore>((set, get) => ({
       );
 
       if (!product?._shopify?.variantId) {
+        console.error('❌ [Store] Product not found for cabinet:', cabinet);
         throw new Error(`Product not found for cabinet: ${cabinet.type} ${cabinet.size}`);
       }
+
+      console.log('🛒 [Store] Adding item:', { 
+        product: product.title, 
+        variantId: product._shopify.variantId 
+      });
 
       return {
         variantId: product._shopify.variantId,
@@ -145,6 +168,9 @@ export const useConfiguratorStore = create<ConfiguratorStore>((set, get) => ({
       };
     });
 
-    return await shopifyCart.addItems(items);
+    console.log('🛒 [Store] Cart items:', items);
+    const checkoutUrl = await shopifyCart.addItems(items);
+    console.log('✅ [Store] Checkout URL:', checkoutUrl);
+    return checkoutUrl;
   }
 }));
