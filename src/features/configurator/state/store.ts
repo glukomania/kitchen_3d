@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import { sampleCatalog } from "@/features/configurator/data/sampleCatalog";
 import type { Catalog, Id, SelectedOptions, PlacedCabinet } from "@/features/configurator/model/types";
+import { ShopifyClient, ShopifyConfig } from "@/integrations/shopify/client";
+import { ShopifyAdapter } from "@/integrations/shopify/adapter";
+import { ShopifyCart } from "@/integrations/shopify/cart";
 
 export type RenderMode = "2d" | "three";
 
@@ -11,6 +14,8 @@ export type ConfiguratorState = {
   selectedOptions: SelectedOptions;
   renderMode: RenderMode;
   placedCabinets: PlacedCabinet[];
+  shopifyClient: ShopifyClient | null;
+  shopifyCart: ShopifyCart | null;
 };
 
 function getDefaultSelectedOptions(catalog: Catalog, productId: Id): SelectedOptions {
@@ -33,17 +38,21 @@ type ConfiguratorActions = {
   moveCabinet: (cabinetId: Id, x: number, y: number) => void;
   rotateCabinet: (cabinetId: Id, rotation: number) => void;
   removeCabinet: (cabinetId: Id) => void;
+  initShopify: (config: ShopifyConfig) => Promise<void>;
+  addToCart: () => Promise<string>;
 };
 
 export type ConfiguratorStore = ConfiguratorState & ConfiguratorActions;
 
-export const useConfiguratorStore = create<ConfiguratorStore>((set) => ({
+export const useConfiguratorStore = create<ConfiguratorStore>((set, get) => ({
   catalog: sampleCatalog,
   activeProductId: initialProductId,
   quantity: 1,
   selectedOptions: getDefaultSelectedOptions(sampleCatalog, initialProductId),
   renderMode: "2d",
   placedCabinets: [],
+  shopifyClient: null,
+  shopifyCart: null,
 
   setQuantity: (quantity) =>
     set({ quantity: Math.max(1, Math.floor(quantity)) }),
@@ -98,5 +107,44 @@ export const useConfiguratorStore = create<ConfiguratorStore>((set) => ({
   removeCabinet: (cabinetId) =>
     set((state) => ({
       placedCabinets: state.placedCabinets.filter((cabinet) => cabinet.id !== cabinetId)
-    }))
+    })),
+
+  initShopify: async (config: ShopifyConfig) => {
+    const client = new ShopifyClient(config);
+    const adapter = new ShopifyAdapter(client);
+    const cart = new ShopifyCart(client);
+
+    const catalog = await adapter.fetchCatalog();
+
+    set({
+      shopifyClient: client,
+      shopifyCart: cart,
+      catalog,
+      activeProductId: catalog.products[0]?.id ?? 'default',
+      selectedOptions: getDefaultSelectedOptions(catalog, catalog.products[0]?.id ?? 'default')
+    });
+  },
+
+  addToCart: async () => {
+    const { shopifyCart, placedCabinets, catalog } = get();
+    if (!shopifyCart) throw new Error('Shopify not initialized');
+
+    const items = placedCabinets.map(cabinet => {
+      const product = catalog.products.find(p => 
+        p._shopify?.type === cabinet.type && 
+        p._shopify?.size === cabinet.size
+      );
+
+      if (!product?._shopify?.variantId) {
+        throw new Error(`Product not found for cabinet: ${cabinet.type} ${cabinet.size}`);
+      }
+
+      return {
+        variantId: product._shopify.variantId,
+        quantity: 1
+      };
+    });
+
+    return await shopifyCart.addItems(items);
+  }
 }));

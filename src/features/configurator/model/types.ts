@@ -42,6 +42,12 @@ export type Product = {
   subtitle?: string;
   basePrice: Money;
   optionGroups: OptionGroup[];
+  _shopify?: {
+    id: string;
+    variantId: string;
+    type: string;
+    size: string;
+  };
 };
 
 export type Catalog = {

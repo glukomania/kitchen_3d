@@ -22,7 +22,7 @@ export function defineConfiguratorElement(options: DefineOptions = {}) {
   if (customElements.get(tagName)) return;
 
   class SkConfiguratorElement extends HTMLElement {
-    static observedAttributes = ["data-catalog"];
+    static observedAttributes = ["data-catalog", "data-config"];
 
     private _root: Root | null = null;
 
@@ -43,13 +43,16 @@ export function defineConfiguratorElement(options: DefineOptions = {}) {
 
     private render() {
       if (!this._root) return;
+      
+      // Try new data-config first, fallback to legacy data-catalog
+      const config = parseJsonAttribute<any>(this.getAttribute("data-config"));
       const catalog = parseJsonAttribute<Catalog>(this.getAttribute("data-catalog"));
 
       this._root.render(
         createElement(
           AppProvider,
           {},
-          createElement(WidgetRoot, { catalog })
+          createElement(WidgetRoot, { config, catalog })
         )
       );
     }
