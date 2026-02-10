@@ -11,7 +11,7 @@ export class ShopifyClient {
     this.endpoint = `https://${config.domain}/api/2024-01/graphql.json`;
     this.headers = {
       'Content-Type': 'application/json',
-      'X-Shopify-Storefront-Access-Token': config.storefrontAccessToken
+    //   'X-Shopify-Storefront-Access-Token': config.storefrontAccessToken
     };
   }
 
