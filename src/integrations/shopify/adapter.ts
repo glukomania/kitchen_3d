@@ -54,7 +54,8 @@ export class ShopifyAdapter {
     const sizeMatch = handle.match(/(\d+)cm/);
     const size = sizeMatch ? sizeMatch[1] : '40';
 
-    const priceAmount = parseFloat(shopifyProduct.priceRange.minVariantPrice.amount);
+    // Shopify returns price as "3000.00", we need to convert to 3000 (integer)
+    const priceAmount = Math.round(parseFloat(shopifyProduct.priceRange.minVariantPrice.amount));
     console.log(`💰 [Adapter] Product "${shopifyProduct.title}": ${priceAmount} ${shopifyProduct.priceRange.minVariantPrice.currencyCode}`);
 
     return {
