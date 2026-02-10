@@ -22,8 +22,23 @@ export class ShopifyClient {
       body: JSON.stringify({ query, variables })
     });
 
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('Shopify API Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: text,
+        endpoint: this.endpoint,
+        headers: this.headers
+      });
+      throw new Error(`Shopify API error: ${response.status} ${response.statusText}`);
+    }
+
     const { data, errors } = await response.json();
-    if (errors) throw new Error(errors[0].message);
+    if (errors) {
+      console.error('GraphQL errors:', errors);
+      throw new Error(errors[0].message);
+    }
     return data;
   }
 }
