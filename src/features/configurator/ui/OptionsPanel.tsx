@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
   selectActiveProduct,
-  selectSelectedOptions
+  selectSelectedOptions,
+  selectCatalog
 } from "@/features/configurator/state/selectors";
 import { FieldLabel } from "@/shared/ui/components/FieldLabel";
 import { SwatchRow } from "@/shared/ui/components/SwatchRow";
@@ -13,10 +14,30 @@ export function OptionsPanel() {
   const dispatch = useAppDispatch();
   const product = useAppSelector(selectActiveProduct);
   const selected = useAppSelector(selectSelectedOptions);
+  const catalog = useAppSelector(selectCatalog);
 
   const groups = useMemo(() => product?.optionGroups ?? [], [product]);
   const title = useMemo(() => product?.title ?? "Configurator", [product]);
   const subtitle = useMemo(() => product?.subtitle ?? "", [product]);
+
+  // Generate cabinet items from Shopify products
+  const cabinetItems = useMemo(() => {
+    return catalog.products
+      .filter(p => p._shopify?.type && p._shopify?.size)
+      .map(p => ({
+        type: p._shopify!.type,
+        size: p._shopify!.size,
+        label: p.title,
+        id: p.id,
+        imageUrl: p.imageUrl,
+        price: p.basePrice
+      }))
+      .sort((a, b) => {
+        // Sort: top first, then by size
+        if (a.type !== b.type) return a.type === 'top' ? -1 : 1;
+        return parseInt(a.size) - parseInt(b.size);
+      });
+  }, [catalog]);
 
   return (
     <div className="configurator-options-panel !grid gap-6 md:!grid-cols-[420px_1fr]">
@@ -49,10 +70,16 @@ export function OptionsPanel() {
           <div className="configurator-cabinets-section">
             <FieldLabel>Skříňky</FieldLabel>
             <div className="configurator-cabinets-grid mt-2 !grid !grid-cols-2 gap-3">
-              <CabinetItem type="top" size="40" label="Horní 40cm" />
-              <CabinetItem type="top" size="60" label="Horní 60cm" />
-              <CabinetItem type="bottom" size="40" label="Dolní 40cm" />
-              <CabinetItem type="bottom" size="60" label="Dolní 60cm" />
+              {cabinetItems.map((item) => (
+                <CabinetItem 
+                  key={item.id}
+                  type={item.type} 
+                  size={item.size} 
+                  label={item.label}
+                  imageUrl={item.imageUrl}
+                  price={item.price}
+                />
+              ))}
             </div>
           </div>
         </div>

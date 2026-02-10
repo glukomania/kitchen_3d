@@ -22,6 +22,10 @@ const GET_PRODUCTS = `
               }
             }
           }
+          featuredImage {
+            url
+            altText
+          }
         }
       }
     }
@@ -58,6 +62,7 @@ export class ShopifyAdapter {
         amount: Math.round(parseFloat(shopifyProduct.priceRange.minVariantPrice.amount) * 100),
         currency: shopifyProduct.priceRange.minVariantPrice.currencyCode
       },
+      imageUrl: shopifyProduct.featuredImage?.url || undefined,
       optionGroups: [
         {
           id: 'color',
