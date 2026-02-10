@@ -54,12 +54,15 @@ export class ShopifyAdapter {
     const sizeMatch = handle.match(/(\d+)cm/);
     const size = sizeMatch ? sizeMatch[1] : '40';
 
+    const priceAmount = parseFloat(shopifyProduct.priceRange.minVariantPrice.amount);
+    console.log(`💰 [Adapter] Product "${shopifyProduct.title}": ${priceAmount} ${shopifyProduct.priceRange.minVariantPrice.currencyCode}`);
+
     return {
       id: shopifyProduct.handle,
       title: shopifyProduct.title,
       subtitle: 'Kitchen Cabinet',
       basePrice: {
-        amount: Math.round(parseFloat(shopifyProduct.priceRange.minVariantPrice.amount) * 100),
+        amount: priceAmount,
         currency: shopifyProduct.priceRange.minVariantPrice.currencyCode
       },
       imageUrl: shopifyProduct.featuredImage?.url || undefined,
