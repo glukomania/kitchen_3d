@@ -6,3 +6,4 @@ build/
 .env
 .env.local
 SHOPIFY_SECRET.md
+test-shopify-token.html
