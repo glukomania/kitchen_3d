@@ -15,10 +15,20 @@ export function OptionsPanel() {
   const product = useAppSelector(selectActiveProduct);
   const selected = useAppSelector(selectSelectedOptions);
   const catalog = useAppSelector(selectCatalog);
+  const platformType = useAppSelector((s) => s.platformType);
 
   const groups = useMemo(() => product?.optionGroups ?? [], [product]);
   const title = useMemo(() => product?.title ?? "Configurator", [product]);
-  const subtitle = useMemo(() => product?.subtitle ?? "", [product]);
+  const envLabel = useMemo(() => {
+    if (platformType === "shopify") return "Shopify";
+    if (platformType === "shoptet") return "Shoptet";
+    return "Custom";
+  }, [platformType]);
+
+  const subtitle = useMemo(() => {
+    if (product?.subtitle) return product.subtitle;
+    return `Vítejte v našem ${envLabel} eshopu`;
+  }, [product, envLabel]);
 
   // Generate cabinet items from Shopify products
   const cabinetItems = useMemo(() => {
