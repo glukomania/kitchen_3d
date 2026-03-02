@@ -25,10 +25,10 @@ export function OptionsPanel() {
     return "Custom";
   }, [platformType]);
 
-  const subtitle = useMemo(() => {
-    if (product?.subtitle) return product.subtitle;
-    return `Vítejte v našem ${envLabel} eshopu`;
-  }, [product, envLabel]);
+  const subtitle = useMemo(
+    () => `Vítejte v našem ${envLabel} eshopu`,
+    [envLabel]
+  );
 
   // Generate cabinet items from Shopify products
   const cabinetItems = useMemo(() => {
