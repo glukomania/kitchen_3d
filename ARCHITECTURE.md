@@ -14,8 +14,23 @@
 Location: `src/features/configurator/data`
 
 - mock data (`sampleCatalog`)
-- client API adapters (can be added later)
 - **no UI**
+
+### 1.5) Platform Integrations
+
+Location: `src/integrations`
+
+- e-commerce platform adapters (Shopify, Shoptet, etc.)
+- common interfaces (`PlatformAdapter`, `PlatformCart`)
+- platform factory for creating instances
+- **no UI, no state**
+
+Each platform integration consists of:
+- `client.ts` - API client
+- `adapter.ts` - transforms platform data → `Catalog`
+- `cart.ts` - handles cart operations
+
+The widget automatically selects the correct integration based on configuration.
 
 ### 2) Model (domain types/structures)
 

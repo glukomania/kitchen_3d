@@ -43,8 +43,15 @@ export type Product = {
   basePrice: Money;
   optionGroups: OptionGroup[];
   imageUrl?: string;
+  // Platform-specific metadata
   _shopify?: {
     id: string;
+    variantId: string;
+    type: string;
+    size: string;
+  };
+  _shoptet?: {
+    guid: string;
     variantId: string;
     type: string;
     size: string;

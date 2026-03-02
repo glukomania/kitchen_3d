@@ -1,6 +1,10 @@
-export type ShopifyConfig = {
-  domain: string;
-  storefrontAccessToken: string;
+import type { ShopifyPlatformConfig } from '@/integrations/types';
+
+export type ShopifyConfig = ShopifyPlatformConfig;
+
+type GraphQLResponse<T> = {
+  data: T;
+  errors?: Array<{ message: string }>;
 };
 
 export class ShopifyClient {
@@ -15,7 +19,7 @@ export class ShopifyClient {
     };
   }
 
-  async query<T>(query: string, variables?: any): Promise<T> {
+  async query<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
     const response = await fetch(this.endpoint, {
       method: 'POST',
       headers: this.headers,
@@ -34,11 +38,11 @@ export class ShopifyClient {
       throw new Error(`Shopify API error: ${response.status} ${response.statusText}`);
     }
 
-    const { data, errors } = await response.json();
-    if (errors) {
-      console.error('GraphQL errors:', errors);
-      throw new Error(errors[0].message);
+    const result = (await response.json()) as GraphQLResponse<T>;
+    if (result.errors && result.errors.length > 0) {
+      console.error('GraphQL errors:', result.errors);
+      throw new Error(result.errors[0].message);
     }
-    return data;
+    return result.data;
   }
 }

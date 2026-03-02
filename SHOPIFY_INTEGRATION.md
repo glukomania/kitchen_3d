@@ -1,5 +1,118 @@
 # Shopify Deep Integration Guide
 
+## 🚀 Technická implementace (česky)
+
+### 1. Struktura souborů
+
+Vytvořte strukturu:
+```
+src/integrations/shopify/
+├── client.ts      # GraphQL klient pro Shopify API
+├── adapter.ts     # Transformace Shopify produktů → Catalog
+└── cart.ts        # Přidání do košíku
+```
+
+### 2. ShopifyClient (client.ts)
+
+**Žádné knihovny nejsou potřeba** - použijte nativní `fetch`:
+
+```typescript
+export class ShopifyClient {
+  private endpoint: string;
+  private headers: HeadersInit;
+
+  constructor(config: { domain: string; storefrontAccessToken: string }) {
+    this.endpoint = `https://${config.domain}/api/2024-01/graphql.json`;
+    this.headers = {
+      'Content-Type': 'application/json',
+      'X-Shopify-Storefront-Access-Token': config.storefrontAccessToken
+    };
+  }
+
+  async query<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
+    const response = await fetch(this.endpoint, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify({ query, variables })
+    });
+    const result = await response.json();
+    if (result.errors) throw new Error(result.errors[0].message);
+    return result.data;
+  }
+}
+```
+
+### 3. ShopifyAdapter (adapter.ts)
+
+GraphQL dotaz pro načtení produktů:
+
+```typescript
+const GET_PRODUCTS = `
+  query GetProducts($query: String) {
+    products(first: 50, query: $query) {
+      edges {
+        node {
+          id
+          title
+          handle
+          priceRange { minVariantPrice { amount currencyCode } }
+          variants(first: 1) { edges { node { id } } }
+          featuredImage { url }
+        }
+      }
+    }
+  }
+`;
+
+async fetchCatalog(): Promise<Catalog> {
+  const data = await this.client.query(GET_PRODUCTS, {
+    query: 'tag:kitchen-configurator'
+  });
+  return { products: data.products.edges.map(edge => this.mapProduct(edge.node)) };
+}
+```
+
+### 4. ShopifyCart (cart.ts)
+
+GraphQL mutace pro košík:
+
+```typescript
+const CREATE_CART = `
+  mutation CreateCart($lines: [CartLineInput!]!) {
+    cartCreate(input: { lines: $lines }) {
+      cart { id checkoutUrl }
+    }
+  }
+`;
+
+async addItems(items: CartItem[]): Promise<string> {
+  const lines = items.map(item => ({
+    merchandiseId: item.variantId,
+    quantity: item.quantity
+  }));
+  const data = await this.client.query(CREATE_CART, { lines });
+  return data.cartCreate.cart.checkoutUrl;
+}
+```
+
+### 5. Integrace do store
+
+V `store.ts` přidejte:
+
+```typescript
+initShopify: async (config) => {
+  const client = new ShopifyClient(config);
+  const adapter = new ShopifyAdapter(client);
+  const cart = new ShopifyCart(client);
+  const catalog = await adapter.fetchCatalog();
+  set({ catalog, shopifyCart: cart });
+}
+```
+
+**Důležité:** Používá se **Shopify Storefront API (GraphQL)**, ne Admin API. Žádné externí knihovny nejsou potřeba.
+
+---
+
 ## Overview
 
 Integrate the configurator with Shopify to:

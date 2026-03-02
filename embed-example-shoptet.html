@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitchen Configurator - Shoptet Integration Example</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      border-left: 4px solid #2196f3;
+    }
+    .info code {
+      background: rgba(0,0,0,0.05);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Monaco', 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Kitchen Configurator - Shoptet Integration</h1>
+    
+    <div class="info">
+      <strong>ℹ️ Configuration:</strong><br>
+      This example demonstrates Shoptet integration.<br>
+      Platform: <code>shoptet</code><br>
+      API URL: <code>https://your-store.shoptet.cz/api</code><br>
+      <br>
+      <strong>Note:</strong> Replace the API credentials below with your actual Shoptet store credentials.
+    </div>
+
+    <!-- Widget container -->
+    <kitchen-configurator-widget></kitchen-configurator-widget>
+  </div>
+
+  <!-- Widget Configuration -->
+  <script>
+    window.kitchenConfiguratorConfig = {
+      platform: {
+        type: 'shoptet',
+        apiUrl: 'https://your-store.shoptet.cz/api',
+        apiKey: 'your-shoptet-api-key-here'
+      }
+    };
+  </script>
+
+  <!-- Widget Script -->
+  <script src="https://glukomania.github.io/kitchen_3d/configurator-widget.iife.js"></script>
+
+  <!-- Debug Info -->
+  <script>
+    console.log('🔧 Shoptet Integration Example');
+    console.log('📦 Config:', window.kitchenConfiguratorConfig);
+    console.log('🎯 Platform:', window.kitchenConfiguratorConfig.platform.type);
+  </script>
+</body>
+</html>

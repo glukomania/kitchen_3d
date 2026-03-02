@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { useAppDispatch } from "@/app/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { Button } from "@/features/configurator/ui/Button";
 
 export function ButtonsPanel() {
   const dispatch = useAppDispatch();
+  const platformCart = useAppSelector((s) => s.platformCart);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const hasPlatform = platformCart != null;
 
   const handleAddToCart = async () => {
     console.log('🛒 [ButtonsPanel] Add to cart button clicked');
@@ -13,11 +16,13 @@ export function ButtonsPanel() {
     setError(null);
 
     try {
-      console.log('🛒 [ButtonsPanel] Calling dispatch.addToCart()...');
       const checkoutUrl = await dispatch.addToCart();
-      console.log('🛒 [ButtonsPanel] Got checkout URL:', checkoutUrl);
-      console.log('🛒 [ButtonsPanel] Redirecting to checkout...');
-      window.location.href = checkoutUrl;
+      setLoading(false);
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        setError('Add to cart is available when embedded in Shopify or Shoptet.');
+      }
     } catch (err) {
       console.error('❌ [ButtonsPanel] Error adding to cart:', err);
       setError(err instanceof Error ? err.message : 'Failed to add to cart');
@@ -27,15 +32,19 @@ export function ButtonsPanel() {
 
   return (
     <div className="configurator-buttons-panel">
-      <Button 
-        title={loading ? 'Adding to cart...' : 'Add to cart'} 
-        onClick={handleAddToCart}
+      <Button
+        title={loading ? 'Adding to cart...' : 'Add to cart'}
+        onClick={() => void handleAddToCart()}
+        disabled={!hasPlatform}
       />
-      
-      {error && (
-        <div className="text-sm text-red-600 mt-2">{error}</div>
+      {!hasPlatform && (
+        <p className="configurator-buttons-panel-stub text-sm text-gray-500 mt-2">
+          Add to cart is available when the configurator is embedded in Shopify or Shoptet.
+        </p>
       )}
-      
+      {error && (
+        <div className="configurator-buttons-panel-error text-sm text-red-600 mt-2">{error}</div>
+      )}
       <Button title="Send request" />
     </div>
   );

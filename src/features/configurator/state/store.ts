@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import { sampleCatalog } from "@/features/configurator/data/sampleCatalog";
 import type { Catalog, Id, SelectedOptions, PlacedCabinet } from "@/features/configurator/model/types";
-import { ShopifyClient, ShopifyConfig } from "@/integrations/shopify/client";
-import { ShopifyAdapter } from "@/integrations/shopify/adapter";
-import { ShopifyCart } from "@/integrations/shopify/cart";
+import type { PlatformConfig, PlatformAdapter, PlatformCart } from "@/integrations/types";
+import { PlatformFactory } from "@/integrations/factory";
+// Legacy support
+import { ShopifyConfig } from "@/integrations/shopify/client";
 
 export type RenderMode = "2d" | "three";
 
@@ -14,8 +15,9 @@ export type ConfiguratorState = {
   selectedOptions: SelectedOptions;
   renderMode: RenderMode;
   placedCabinets: PlacedCabinet[];
-  shopifyClient: ShopifyClient | null;
-  shopifyCart: ShopifyCart | null;
+  platformAdapter: PlatformAdapter | null;
+  platformCart: PlatformCart | null;
+  platformType: 'shopify' | 'shoptet' | null;
 };
 
 function getDefaultSelectedOptions(catalog: Catalog, productId: Id): SelectedOptions {
@@ -38,7 +40,8 @@ type ConfiguratorActions = {
   moveCabinet: (cabinetId: Id, x: number, y: number) => void;
   rotateCabinet: (cabinetId: Id, rotation: number) => void;
   removeCabinet: (cabinetId: Id) => void;
-  initShopify: (config: ShopifyConfig) => Promise<void>;
+  initPlatform: (config: PlatformConfig) => Promise<void>;
+  initShopify: (config: ShopifyConfig) => Promise<void>; // Legacy support
   addToCart: () => Promise<string>;
 };
 
@@ -51,8 +54,9 @@ export const useConfiguratorStore = create<ConfiguratorStore>((set, get) => ({
   selectedOptions: getDefaultSelectedOptions(sampleCatalog, initialProductId),
   renderMode: "2d",
   placedCabinets: [],
-  shopifyClient: null,
-  shopifyCart: null,
+  platformAdapter: null,
+  platformCart: null,
+  platformType: null,
 
   setQuantity: (quantity) =>
     set({ quantity: Math.max(1, Math.floor(quantity)) }),
@@ -109,36 +113,45 @@ export const useConfiguratorStore = create<ConfiguratorStore>((set, get) => ({
       placedCabinets: state.placedCabinets.filter((cabinet) => cabinet.id !== cabinetId)
     })),
 
-  initShopify: async (config: ShopifyConfig) => {
-    console.log('🔧 [Store] Initializing Shopify with config:', { domain: config.domain });
-    const client = new ShopifyClient(config);
-    const adapter = new ShopifyAdapter(client);
-    const cart = new ShopifyCart(client);
+  initPlatform: async (config: PlatformConfig) => {
+    console.log('🔧 [Store] Initializing platform:', config.type);
+    
+    const adapter = PlatformFactory.createAdapter(config);
+    const cart = PlatformFactory.createCart(config);
 
-    console.log('🔧 [Store] Fetching catalog from Shopify...');
+    console.log('🔧 [Store] Fetching catalog from', config.type, '...');
     const catalog = await adapter.fetchCatalog();
     console.log('🔧 [Store] Catalog fetched:', catalog.products.length, 'products');
 
     set({
-      shopifyClient: client,
-      shopifyCart: cart,
+      platformAdapter: adapter,
+      platformCart: cart,
+      platformType: config.type,
       catalog,
       activeProductId: catalog.products[0]?.id ?? 'default',
       selectedOptions: getDefaultSelectedOptions(catalog, catalog.products[0]?.id ?? 'default')
     });
-    console.log('✅ [Store] Shopify initialized successfully');
+    console.log('✅ [Store] Platform initialized successfully:', config.type);
+  },
+
+  // Legacy support for Shopify
+  initShopify: async (config: ShopifyConfig) => {
+    console.log('🔧 [Store] Legacy initShopify called, redirecting to initPlatform');
+    await get().initPlatform({ ...config, type: 'shopify' });
   },
 
   addToCart: async () => {
     console.log('🛒 [Store] addToCart called');
-    const { shopifyCart, placedCabinets, catalog } = get();
+    const { platformCart, platformType, placedCabinets, catalog } = get();
     
     console.log('🛒 [Store] Placed cabinets:', placedCabinets);
     console.log('🛒 [Store] Catalog products:', catalog.products.length);
+    console.log('🛒 [Store] Platform type:', platformType);
     
-    if (!shopifyCart) {
-      console.error('❌ [Store] Shopify not initialized!');
-      throw new Error('Shopify not initialized');
+    // No platform: return empty string so UI can show stub message without crashing
+    if (!platformCart) {
+      console.warn('⚠️ [Store] Platform not initialized — add to cart is a no-op');
+      return '';
     }
 
     if (placedCabinets.length === 0) {
@@ -147,29 +160,42 @@ export const useConfiguratorStore = create<ConfiguratorStore>((set, get) => ({
     }
 
     const items = placedCabinets.map(cabinet => {
-      const product = catalog.products.find(p => 
-        p._shopify?.type === cabinet.type && 
-        p._shopify?.size === cabinet.size
-      );
+      let product;
+      let variantId;
 
-      if (!product?._shopify?.variantId) {
+      // Find product based on platform type
+      if (platformType === 'shopify') {
+        product = catalog.products.find(p => 
+          p._shopify?.type === cabinet.type && 
+          p._shopify?.size === cabinet.size
+        );
+        variantId = product?._shopify?.variantId;
+      } else if (platformType === 'shoptet') {
+        product = catalog.products.find(p => 
+          p._shoptet?.type === cabinet.type && 
+          p._shoptet?.size === cabinet.size
+        );
+        variantId = product?._shoptet?.variantId;
+      }
+
+      if (!product || !variantId) {
         console.error('❌ [Store] Product not found for cabinet:', cabinet);
         throw new Error(`Product not found for cabinet: ${cabinet.type} ${cabinet.size}`);
       }
 
       console.log('🛒 [Store] Adding item:', { 
         product: product.title, 
-        variantId: product._shopify.variantId 
+        variantId 
       });
 
       return {
-        variantId: product._shopify.variantId,
+        variantId,
         quantity: 1
       };
     });
 
     console.log('🛒 [Store] Cart items:', items);
-    const checkoutUrl = await shopifyCart.addItems(items);
+    const checkoutUrl = await platformCart.addItems(items);
     console.log('✅ [Store] Checkout URL:', checkoutUrl);
     return checkoutUrl;
   }

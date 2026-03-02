@@ -116,13 +116,55 @@ For local testing:
 <sk-configurator id="my-configurator"></sk-configurator>
 ```
 
-### Embedding in Shopify or other platforms
+### E-commerce Platform Integration
 
-When embedding on external platforms (like Shopify), make sure:
+This widget supports multiple e-commerce platforms out of the box:
 
-1. Load both CSS and JS files from GitHub Pages
-2. Use `customElements.whenDefined()` to wait for element registration before setting attributes
-3. Images are loaded from absolute URLs (configured automatically)
+#### **Shopify**
+
+```html
+<script>
+  window.kitchenConfiguratorConfig = {
+    platform: {
+      type: 'shopify',
+      domain: 'your-store.myshopify.com',
+      storefrontAccessToken: 'your-token'
+    }
+  };
+</script>
+<script src="configurator-widget.iife.js"></script>
+<kitchen-configurator-widget></kitchen-configurator-widget>
+```
+
+#### **Shoptet**
+
+```html
+<script>
+  window.kitchenConfiguratorConfig = {
+    platform: {
+      type: 'shoptet',
+      apiUrl: 'https://your-store.shoptet.cz/api',
+      apiKey: 'your-api-key'
+    }
+  };
+</script>
+<script src="configurator-widget.iife.js"></script>
+<kitchen-configurator-widget></kitchen-configurator-widget>
+```
+
+#### **Static Catalog**
+
+```html
+<script>
+  window.kitchenConfiguratorConfig = {
+    catalog: { products: [...] }
+  };
+</script>
+<script src="configurator-widget.iife.js"></script>
+<kitchen-configurator-widget></kitchen-configurator-widget>
+```
+
+**See detailed integration guide:** `PLATFORM_INTEGRATION.md`
 
 **Important notes:**
 - The widget uses absolute URLs for assets (images) to work correctly on external sites
@@ -151,6 +193,11 @@ src/
       model/            # domain types only
       state/            # slice + selectors (contract for UI/renderer)
       ui/               # feature UI components (tailwind, composition)
+  integrations/         # e-commerce platform integrations
+    types.ts            # common interfaces
+    factory.ts          # platform factory
+    shopify/            # Shopify integration
+    shoptet/            # Shoptet integration
   renderers/
     2d/                 # 2D renderer placeholder
     three/              # three.js renderer minimal example
