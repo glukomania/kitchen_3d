@@ -36,7 +36,7 @@ export function ButtonsPanel() {
       <Button
         title={loading ? 'Adding to cart...' : 'Add to cart'}
         onClick={() => void handleAddToCart()}
-        disabled={!hasPlatform}
+        // disabled={!hasPlatform}
       />
       {!hasPlatform && (
         <p className="configurator-buttons-panel-stub text-sm text-gray-500 mt-2">
