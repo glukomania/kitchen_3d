@@ -10,6 +10,24 @@ export function ButtonsPanel() {
 
   const hasPlatform = platformCart != null;
 
+  const getPriceIdsFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get('products');
+    if (!raw) return [];
+    return raw.split(',').map(id => Number(id));
+  }
+
+  function addSelectedProductsToCart() {
+    const ids = getPriceIdsFromUrl();
+  
+    ids.forEach(priceId => {
+      window.shoptet.cartShared.addToCart({
+        priceId,
+        amount: 1
+      });
+    });
+  }
+
   const handleAddToCart = async () => {
     console.log('🛒 [ButtonsPanel] Add to cart button clicked');
     console.log('Add to cart', window.shoptet.cartShared.addToCart({ priceId: 14, amount: 1 }))
@@ -35,7 +53,7 @@ export function ButtonsPanel() {
     <div className="configurator-buttons-panel">
       <Button
         title={loading ? 'Adding to cart...' : 'Add to cart'}
-        onClick={() => void handleAddToCart()}
+        onClick={() => void addSelectedProductsToCart()}
         // disabled={!hasPlatform}
       />
       {!hasPlatform && (
