@@ -12,6 +12,7 @@ export function ButtonsPanel() {
 
   const handleAddToCart = async () => {
     console.log('🛒 [ButtonsPanel] Add to cart button clicked');
+    console.log('Add to cart', window.shoptet.cartShared.addToCart({ priceId: 14, amount: 1 }))
     setLoading(true);
     setError(null);
 
