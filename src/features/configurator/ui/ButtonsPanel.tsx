@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { Button } from "@/features/configurator/ui/Button";
 
@@ -48,6 +48,11 @@ export function ButtonsPanel() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    addSelectedProductsToCart();
+    console.log('🛒 [ButtonsPanel] Selected products added to cart');
+  }, []);
 
   return (
     <div className="configurator-buttons-panel">
