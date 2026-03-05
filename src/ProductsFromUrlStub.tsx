@@ -1,5 +1,8 @@
+import { useEffect } from "react";
+
 /**
- * Stub: reads product price IDs from URL query (?products=1,2,3) and displays them.
+ * Stub: reads product price IDs from URL query (?products=1,2,3),
+ * displays them and adds to cart via Shoptet API when available.
  */
 
 function getPriceIdsFromUrl(): number[] {
@@ -13,8 +16,19 @@ function getPriceIdsFromUrl(): number[] {
     .filter((n) => !Number.isNaN(n));
 }
 
+function addProductsFromUrlToCart(ids: number[]): void {
+  const shoptet = typeof window !== "undefined" ? (window as Window & { shoptet?: { cartShared?: { addToCart: (opts: { priceId: number; amount: number }) => void } } }).shoptet : undefined;
+  const addToCart = shoptet?.cartShared?.addToCart;
+  if (!addToCart || ids.length === 0) return;
+  ids.forEach((priceId) => addToCart({ priceId, amount: 1 }));
+}
+
 export function ProductsFromUrlStub() {
   const ids = getPriceIdsFromUrl();
+
+  useEffect(() => {
+    addProductsFromUrlToCart(getPriceIdsFromUrl());
+  }, []);
 
   return (
     <div className="products-from-url-stub h-[200px] w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
