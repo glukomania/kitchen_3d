@@ -17,8 +17,8 @@ export function ProductsFromUrlStub() {
   const ids = getPriceIdsFromUrl();
 
   return (
-    <div className="products-from-url-stub min-h-screen bg-slate-100 p-8">
-      <div className="products-from-url-stub-inner mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="products-from-url-stub h-[200px] w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="products-from-url-stub-inner">
         <p className="products-from-url-stub-title font-medium text-slate-800">
           Produkty:
         </p>

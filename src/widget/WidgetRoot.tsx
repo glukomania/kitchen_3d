@@ -3,7 +3,7 @@ import type { Catalog } from "@/features/configurator/model/types";
 import type { PlatformConfig } from "@/integrations/types";
 import type { ShopifyConfig } from "@/integrations/shopify/client";
 import { sampleCatalog } from "@/features/configurator/data/sampleCatalog";
-import { Configurator } from "@/features/configurator/ui/Configurator";
+import { ProductsFromUrlStub } from "@/ProductsFromUrlStub";
 import { useAppDispatch } from "@/app/hooks";
 
 type Props = {
@@ -66,7 +66,7 @@ export function WidgetRoot(props: Props) {
     });
   }, [config, legacyCatalog, dispatch]);
 
-  return <Configurator />;
+  return <ProductsFromUrlStub />;
 }
 
 
