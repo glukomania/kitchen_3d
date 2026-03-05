@@ -3,6 +3,7 @@ import { QuantityBar } from "@/features/configurator/ui/QuantityBar";
 import { ButtonsPanel } from "@/features/configurator/ui/ButtonsPanel";
 
 export function Configurator() {
+  console.log('Configurator')
   return (
     <div className="configurator-container w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <OptionsPanel />
