@@ -20,6 +20,7 @@ function addProductsFromUrlToCart(ids: number[]): void {
   const shoptet = typeof window !== "undefined" ? (window as Window & { shoptet?: { cartShared?: { addToCart: (opts: { priceId: number; amount: number }) => void } } }).shoptet : undefined;
   const addToCart = shoptet?.cartShared?.addToCart;
   console.log('products', window.getShoptetProductsList());
+  console.log('window', window);
   if (!addToCart || ids.length === 0) return;
   ids.forEach((priceId) => addToCart({ priceId, amount: 1 }));
 }
